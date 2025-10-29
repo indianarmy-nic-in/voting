@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>वोट काउंट - लॉगिन</title>
+<style>
+  * {
+    margin: 0; padding: 0; box-sizing: border-box; user-select: none;
+  }
+  body, html {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background: #eef9ee;
+    overflow-x: hidden;
+  }
+  html {
+    touch-action: manipulation;
+  }
+
+  #loginForm {
+    max-width: 350px;
+    margin: 60px auto 30px auto;
+    padding: 20px 30px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.25);
+    border-radius: 10px;
+    background: white;
+  }
+  #loginForm h2 {
+    text-align: center;
+    margin-bottom: 18px;
+    color: #2a5d1a;
+  }
+  #loginForm input {
+    width: 100%;
+    padding: 10px 12px;
+    margin: 7px 0;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+  }
+  #loginBtn {
+    background: #2b7a0b;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+  #loginError {
+    color: red;
+    font-size: 14px;
+    height: 18px;
+    text-align: center;
+    margin-top: 8px;
+  }
+  
+  #voteTableSection {
+    max-width: 600px;
+    margin: 30px auto;
+    display: none;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    user-select: none;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 12px 15px;
+    text-align: left;
+  }
+  th {
+    background-color: #2b7a0b;
+    color: white;
+  }
+  td.nameCell {
+    font-weight: 600;
+  }
+
+  /* Disable zoom */
+  body {
+    touch-action: manipulation;
+  }
+  /* Disable right click */
+  body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="loginForm">
+  <h2>लॉगिन करें</h2>
+  <input type="text" id="username" placeholder="Username" autocomplete="off" />
+  <input type="password" id="password" placeholder="Password" autocomplete="off" />
+  <button id="loginBtn">लॉगिन</button>
+  <div id="loginError"></div>
+</div>
+
+<div id="voteTableSection">
+  <table>
+    <thead>
+      <tr><th>नाम</th><th>वोट्स</th></tr>
+    </thead>
+    <tbody id="voteTableBody"></tbody>
+  </table>
+</div>
+
+<script>
+  const loginForm = document.getElementById('loginForm');
+  const voteTableSection = document.getElementById('voteTableSection');
+  const loginError = document.getElementById('loginError');
+
+  // Votes from localStorage or zero count
+  let votes = JSON.parse(localStorage.getItem('votes')) || {
+    'अजय': 0,
+    'सुरेश': 0,
+    'रीमा': 0,
+    'नीलम': 0,
+    'रोहित': 0
+  };
+
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    if (user === 'Manish' && pass === 'Manish@525') {
+      loginError.textContent = '';
+      loginForm.style.display = 'none';
+      voteTableSection.style.display = 'block';
+      updateVoteTable();
+    } else {
+      loginError.textContent = 'गलत उपयोगकर्ता नाम या पासवर्ड';
+    }
+  });
+
+  function updateVoteTable() {
+    const tbody = document.getElementById('voteTableBody');
+    tbody.innerHTML = '';
+    for (const [name, count] of Object.entries(votes)) {
+      const tr = document.createElement('tr');
+      const nameTd = document.createElement('td');
+      nameTd.textContent = name;
+      nameTd.className = 'nameCell';
+      const countTd = document.createElement('td');
+      countTd.textContent = count;
+      tr.appendChild(nameTd);
+      tr.appendChild(countTd);
+      tbody.appendChild(tr);
+    }
+  }
+
+  // Disable right-click and copying on page
+  window.addEventListener('contextmenu', e => e.preventDefault());
+  document.body.style.userSelect = 'none';
+</script>
+
+</body>
+</html>
