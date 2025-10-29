@@ -3,124 +3,66 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>वोटिंग सिस्टम</title>
+<title>वोटिंग पेज</title>
 <style>
-  /* बेसिक रिसेट */
   * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none; /* कॉपी प्रिवेंट */
+    margin: 0; padding: 0; box-sizing: border-box; user-select: none;
   }
   body, html {
     height: 100%;
     font-family: Arial, sans-serif;
+    background: #f2f9f2;
     overflow-x: hidden;
-    background: #f9f9f9;
   }
-  /* ज़ूम डिसेबल */
   html {
     touch-action: manipulation;
   }
-
-  /* लॉगिन फॉर्म स्टाइल छुपा */
-  #loginForm {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px 30px;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    z-index: 1001;
-    display: none;
-    width: 320px;
-  }
-  #loginForm h2 {
-    margin-bottom: 15px;
-    text-align: center;
-  }
-  #loginForm input {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border: 1px solid #bbb;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-  #loginForm button {
-    width: 100%;
-    padding: 10px;
-    background: #2b7a0b;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  #loginError {
-    color: red;
-    text-align: center;
-    margin-top: 10px;
-    font-size: 14px;
-    height: 18px;
-  }
-
-  /* वोटिंग सेक्शन छुपा जब लॉगिन न हो */
-  #votingSection {
-    max-width: 600px;
-    margin: 60px auto 30px auto;
-    text-align: center;
-    display: none;
-  }
-  #votingSection h1 {
-    margin-bottom: 20px;
-    color: #333;
-  }
-
   .candidates {
+    max-width: 600px;
+    margin: 50px auto;
     display: flex;
-    justify-content: space-around;
     flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 15px;
   }
   .candidate {
     background: white;
-    border-radius: 10px;
-    padding: 15px;
-    margin: 10px;
-    width: 100px;
+    border-radius: 12px;
+    width: 110px;
     cursor: pointer;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    user-select: none;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: center;
+    padding: 10px;
     transition: transform 0.2s ease;
-  }
-  .candidate img {
-    width: 100%;
-    border-radius: 50%;
-    pointer-events: none;
-  }
-  .candidate p {
-    margin-top: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #444;
   }
   .candidate:hover {
     transform: scale(1.1);
   }
+  .candidate img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    pointer-events: none;
+    user-drag: none;
+  }
+  .candidate p {
+    margin-top: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #2a5d1a;
+  }
 
-  /* लोडिंग एनिमेशन */
-  #loadingOverlay {
+  #loadingOverlay, #tickOverlay {
     position: fixed;
     top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
+    width: 100vw; height: 100vh;
     display: none;
     justify-content: center;
     align-items: center;
     z-index: 9999;
+  }
+  #loadingOverlay {
+    background: rgba(0,0,0,0.6);
   }
   #loadingOverlay div {
     width: 50px; height: 50px;
@@ -133,128 +75,57 @@
     0% {transform: rotate(0deg);}
     100% {transform: rotate(360deg);}
   }
-
-  /* टिक मार्क फुल स्क्रीन */
   #tickOverlay {
-    position: fixed;
-    top: 0; left: 0;
-    background: rgba(40,150,40,0.85);
+    background: rgba(40,130,40,0.85);
     color: white;
     font-size: 100px;
-    display: none;
-    width: 100%; height: 100%;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
   }
 
-  /* वोटिंग टेबल */
-  #voteTableSection {
-    max-width: 600px;
-    margin: 20px auto;
-    display: none;
+  /* Zoom disable */
+  body {
+    touch-action: manipulation;
   }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+  /* Disable right-click */
+  body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
   }
-  th, td {
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    text-align: left;
-  }
-  th {
-    background-color: #2b7a0b;
-    color: white;
-  }
-  td.nameCell {
-    font-weight: 600;
-  }
-
-  /* स्क्रीन रिस्ट्रिक्शन्स */
-  img {
-    -webkit-user-drag: none;
-    user-drag: none;
-  }
-
 </style>
 </head>
 <body>
 
-<!-- Hidden login form -->
-<div id="loginForm">
-  <h2>लॉगिन करें</h2>
-  <input type="text" id="username" placeholder="Username" autocomplete="off" />
-  <input type="password" id="password" placeholder="Password" autocomplete="off" />
-  <button id="loginBtn">लॉगिन</button>
-  <div id="loginError"></div>
-</div>
-
-<!-- Voting Section -->
-<div id="votingSection">
-  <h1>कृपया वोट करें</h1>
-  <div class="candidates">
-    <div class="candidate" data-name="अजय">
-      <img src="https://i.pravatar.cc/100?img=1" alt="अजय" />
-      <p>अजय</p>
-    </div>
-    <div class="candidate" data-name="सुरेश">
-      <img src="https://i.pravatar.cc/100?img=2" alt="सुरेश" />
-      <p>सुरेश</p>
-    </div>
-    <div class="candidate" data-name="रीमा">
-      <img src="https://i.pravatar.cc/100?img=3" alt="रीमा" />
-      <p>रीमा</p>
-    </div>
-    <div class="candidate" data-name="नीलम">
-      <img src="https://i.pravatar.cc/100?img=4" alt="नीलम" />
-      <p>नीलम</p>
-    </div>
-    <div class="candidate" data-name="रोहित">
-      <img src="https://i.pravatar.cc/100?img=5" alt="रोहित" />
-      <p>रोहित</p>
-    </div>
+<div class="candidates">
+  <div class="candidate" data-name="अजय">
+    <img src="https://i.pravatar.cc/100?img=1" alt="अजय" />
+    <p>अजय</p>
+  </div>
+  <div class="candidate" data-name="सुरेश">
+    <img src="https://i.pravatar.cc/100?img=2" alt="सुरेश" />
+    <p>सुरेश</p>
+  </div>
+  <div class="candidate" data-name="रीमा">
+    <img src="https://i.pravatar.cc/100?img=3" alt="रीमा" />
+    <p>रीमा</p>
+  </div>
+  <div class="candidate" data-name="नीलम">
+    <img src="https://i.pravatar.cc/100?img=4" alt="नीलम" />
+    <p>नीलम</p>
+  </div>
+  <div class="candidate" data-name="रोहित">
+    <img src="https://i.pravatar.cc/100?img=5" alt="रोहित" />
+    <p>रोहित</p>
   </div>
 </div>
 
-<!-- Loading Overlay -->
-<div id="loadingOverlay">
-  <div></div>
-</div>
-
-<!-- Tick Mark Overlay -->
+<div id="loadingOverlay"><div></div></div>
 <div id="tickOverlay">&#10004;</div>
 
-<!-- Vote Count Table -->
-<div id="voteTableSection">
-  <table>
-    <thead>
-      <tr><th>नाम</th><th>वोट्स</th></tr>
-    </thead>
-    <tbody id="voteTableBody"></tbody>
-  </table>
-</div>
-
 <script>
-  // Disable zoom on mobile
-  document.addEventListener('touchstart', function(event) {
-    if (event.touches.length > 1) {
-      event.preventDefault();
-    }
-  }, { passive: false });
-
-  // Prevent right click and context menu
-  window.addEventListener('contextmenu', e => e.preventDefault());
-
-  // Hide all sensitive UI initially
-  const loginForm = document.getElementById('loginForm');
-  const votingSection = document.getElementById('votingSection');
-  const voteTableSection = document.getElementById('voteTableSection');
-  const loginError = document.getElementById('loginError');
-  let votes = {
+  // Initialize votes from localStorage or zero
+  let votes = JSON.parse(localStorage.getItem('votes')) || {
     'अजय': 0,
     'सुरेश': 0,
     'रीमा': 0,
@@ -262,75 +133,44 @@
     'रोहित': 0
   };
 
-  // Show login form on load
-  loginForm.style.display = 'block';
-
-  // Login function
-  document.getElementById('loginBtn').addEventListener('click', () => {
-    const user = document.getElementById('username').value.trim();
-    const pass = document.getElementById('password').value.trim();
-    if (user === 'Manish' && pass === 'Manish@525') {
-      loginError.textContent = '';
-      loginForm.style.display = 'none';
-      votingSection.style.display = 'block';
-      voteTableSection.style.display = 'block';
-      updateVoteTable();
-    } else {
-      loginError.textContent = 'गलत उपयोगकर्ता नाम या पासवर्ड';
-    }
-  });
-
-  // Elements
   const candidates = document.querySelectorAll('.candidate');
   const loadingOverlay = document.getElementById('loadingOverlay');
   const tickOverlay = document.getElementById('tickOverlay');
 
-  // On candidate click 
+  // Disable zoom on mobile
+  document.addEventListener('touchstart', function(event) {
+    if (event.touches.length > 1) {
+      event.preventDefault();
+    }
+  }, { passive: false });
+
+  // Disable right click/context menu
+  window.addEventListener('contextmenu', e => e.preventDefault());
+
+  // Prevent image dragging/save
+  document.querySelectorAll('img').forEach(img => {
+    img.addEventListener('dragstart', e => e.preventDefault());
+    img.addEventListener('contextmenu', e => e.preventDefault());
+  });
+
   candidates.forEach(candidate => {
     candidate.addEventListener('click', () => {
-      // Show loading animation
       loadingOverlay.style.display = 'flex';
-
       setTimeout(() => {
         loadingOverlay.style.display = 'none';
         tickOverlay.style.display = 'flex';
 
-        // Add vote
-        const candName = candidate.getAttribute('data-name');
-        votes[candName]++;
-        updateVoteTable();
+        let name = candidate.getAttribute('data-name');
+        votes[name]++;
+        // Save votes
+        localStorage.setItem('votes', JSON.stringify(votes));
 
-        // Hide tick after 1.5 seconds
         setTimeout(() => {
           tickOverlay.style.display = 'none';
         }, 1500);
       }, 2000);
     });
   });
-
-  // Update vote count table
-  function updateVoteTable() {
-    const tbody = document.getElementById('voteTableBody');
-    tbody.innerHTML = '';
-    for (const [name, count] of Object.entries(votes)) {
-      const tr = document.createElement('tr');
-      const nameTd = document.createElement('td');
-      nameTd.textContent = name;
-      nameTd.className = 'nameCell';
-      const countTd = document.createElement('td');
-      countTd.textContent = count;
-      tr.appendChild(nameTd);
-      tr.appendChild(countTd);
-      tbody.appendChild(tr);
-    }
-  }
-
-  // Prevent image save by disabling context on images
-  document.querySelectorAll('img').forEach(img => {
-    img.addEventListener('dragstart', e => e.preventDefault());
-    img.addEventListener('contextmenu', e => e.preventDefault());
-  });
-
 </script>
 
 </body>
